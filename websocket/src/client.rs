@@ -37,13 +37,10 @@ fn main() {
         });
 
         // start console loop
+        std::thread::sleep(std::time::Duration::from_millis(2000));
         thread::spawn(move || loop {
-            let mut cmd = String::new();
-            if io::stdin().read_line(&mut cmd).is_err() {
-                println!("error");
-                return;
-            }
-            addr.do_send(ClientCommand(cmd));
+            let cmd = ["test"; 8192];
+            addr.do_send(ClientCommand(cmd.join(" ")));
         });
     });
     sys.run().unwrap();
@@ -95,9 +92,6 @@ impl Handler<ClientCommand> for ChatClient {
 /// Handle server websocket messages
 impl StreamHandler<Result<Frame, WsProtocolError>> for ChatClient {
     fn handle(&mut self, msg: Result<Frame, WsProtocolError>, _: &mut Context<Self>) {
-        if let Ok(Frame::Text(txt)) = msg {
-            println!("Server: {:?}", txt)
-        }
     }
 
     fn started(&mut self, _ctx: &mut Context<Self>) {
