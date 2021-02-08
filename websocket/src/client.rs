@@ -38,10 +38,12 @@ fn main() {
 
         // start console loop
         std::thread::sleep(std::time::Duration::from_millis(2000));
-        thread::spawn(move || loop {
+        loop {
             let cmd = ["test"; 8192];
-            addr.do_send(ClientCommand(cmd.join(" ")));
-        });
+            if let Err(error) = addr.send(ClientCommand(cmd.join(" "))).await {
+                println!("Error: {}", error);
+            }
+        }
     });
     sys.run().unwrap();
 }
